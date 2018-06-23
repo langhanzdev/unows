@@ -23,6 +23,8 @@ public class UnoWSservice {
     private int idPartidas = 0;
     private final int nrPartidas = 500;
     private Partida[] partidas = new Partida[nrPartidas];
+    private ArrayList<PreRegistro> preRegistros = new ArrayList<>();
+   
 
     
     /**
@@ -42,7 +44,7 @@ public class UnoWSservice {
      * Web service operation
      */
     @WebMethod(operationName = "teste2")
-    public String teste2(@WebParam(name = "tipo") String tipo) {
+    public synchronized String teste2(@WebParam(name = "tipo") String tipo) {
         //TODO write your implementation code here:
         return null;
     }
@@ -52,7 +54,9 @@ public class UnoWSservice {
      */
     @WebMethod(operationName = "preRegistro")
     public int preRegistro(@WebParam(name = "j1Nome") String j1Nome, @WebParam(name = "j1Id") int j1Id, @WebParam(name = "j2Nome") String j2Nome, @WebParam(name = "j2Id") int j2Id) {
-        //TODO write your implementation code here:
+        this.preRegistros.add(new PreRegistro(j1Id, j1Nome, idPartidas));
+        this.preRegistros.add(new PreRegistro(j2Id, j2Nome, idPartidas));
+        idPartidas++;
         return 0;
     }
 
@@ -61,16 +65,23 @@ public class UnoWSservice {
      */
     @WebMethod(operationName = "registraJogador")
     public int registraJogador(@WebParam(name = "nome") String nome) {
-        if(nome ==  null || nome.equals(""))
-            return -3;
-        if(usuarioCasdastrado(nome)) return -1;
+        
+        PreRegistro aux = null;
+        for(PreRegistro  pre:preRegistros){ //Percorre lista de pre registros
+            if(pre.getNome().equals(nome)){ //encontrou jogador
+                aux = pre;
+                break;
+            }
+        }
+        
+        if(usuarioCasdastrado(nome)) //se ja está cadastrado
+            return -1;
+
         Jogador jogador = new Jogador();
         jogador.setNome(nome);
-        jogador.setId(geraIdJogador());
-        if(encontraPartidaLivre(jogador))
-            return jogador.getId();
-        else
-            return -2;
+        jogador.setId(aux.getId());
+        return colocaNaPartida(jogador, aux.getPartida()); //return id ou -2
+        
     }
 
     /**
@@ -93,7 +104,7 @@ public class UnoWSservice {
     public int temPartida(@WebParam(name = "idJogador") int idJogador) {
         int partida = encontraPartida(idJogador);
         
-        if(partida == -1) return -2;
+        if(partida == -1) return -1; //Não existe partida para esse jogador
         
         //Tempo aguardando outro jogador entrar
         long t = System.currentTimeMillis()-this.partidas[partida].getTempoAguardaJogador();
@@ -104,7 +115,7 @@ public class UnoWSservice {
         
         if(partida > -1){
             if(this.partidas[partida].getJogador1() == null || this.partidas[partida].getJogador2() == null){
-                return 0;
+                return 0; //Ainda não há partida
             }
             if(this.partidas[partida].getJogador1().getId() == idJogador){
                 this.partidas[partida].preparaJogo();
@@ -158,6 +169,7 @@ public class UnoWSservice {
         int partida = encontraPartida(idJogador);
         int temPartida = temPartida(idJogador);
         
+        if(temPartida == -1) return -6; //Perdedor por WO
         if(temPartida == -2) return 5; //Vencedor por WO
         if(temPartida == 0) return -2; //Não há dois jogadores
         
@@ -169,13 +181,13 @@ public class UnoWSservice {
             if(nrJogador == 1){
                 if(this.partidas[partida].getVez() == 2){
                     if(System.currentTimeMillis()-this.partidas[partida].getTempoAguardaJogada2() > 60000){
-                        return 5;
+                        return 5; //Venceu por WO
                     }
                 }
             }else{
                 if(this.partidas[partida].getVez() == 1){
                     if(System.currentTimeMillis()-this.partidas[partida].getTempoAguardaJogada1() > 60000){
-                        return 5;
+                        return 5; //Venceu por WO
                     }
                 }
             }
@@ -198,7 +210,7 @@ public class UnoWSservice {
             if(this.partidas[partida].getNumCartas() == 0){
                 // Empate
                 if(obtemPontos(idJogador) == obtemPontosOponente(idJogador))
-                    return 4;
+                    return 4; //empate
                 
                 //Pontos do jogador é maior que do oponente
                 if(obtemPontos(idJogador) > obtemPontosOponente(idJogador)){
@@ -223,10 +235,10 @@ public class UnoWSservice {
      */
     @WebMethod(operationName = "obtemNumCartasBaralho")
     public int obtemNumCartasBaralho(@WebParam(name = "idJogador") int idJogador) {
-        if(temPartida(idJogador) == 0) return -2;
+        if(temPartida(idJogador) == 0) return -2; //ainda não tem 2 jogadores
         int partida = encontraPartida(idJogador);
         if(this.partidas[partida].getBaralho() != null)
-            return this.partidas[partida].getNumCartas();
+            return this.partidas[partida].getNumCartas(); //Num cartas do baralho
         return -1;
     }
 
@@ -235,16 +247,16 @@ public class UnoWSservice {
      */
     @WebMethod(operationName = "obtemNumCartas")
     public int obtemNumCartas(@WebParam(name = "idJogador") int idJogador) {
-        if(temPartida(idJogador) == 0) return -2;
+        if(temPartida(idJogador) == 0) return -2;//ainda nao tem 2 jogadores
         int partida = encontraPartida(idJogador);
         int nrJogador = identificaJogador(partida, idJogador);
-        if(nrJogador == 1){
+        if(nrJogador == 1){ //num cartas do jogador
             return this.partidas[partida].getJogador1().getCartas().size();
         }
         if(nrJogador == 2){
             return this.partidas[partida].getJogador2().getCartas().size();
         }
-        return -1;
+        return -1; //erro
     }
 
     /**
@@ -252,16 +264,16 @@ public class UnoWSservice {
      */
     @WebMethod(operationName = "obtemNumCartasOponente")
     public int obtemNumCartasOponente(@WebParam(name = "idJogador") int idJogador) {
-        if(temPartida(idJogador) == 0) return -2;
+        if(temPartida(idJogador) == 0) return -2;//nao tem 2 jogadores
         int partida = encontraPartida(idJogador);
         int nrJogador = identificaJogador(partida, idJogador);
-        if(nrJogador == 1){
+        if(nrJogador == 1){ //num cartas oponente
             return this.partidas[partida].getJogador2().getCartas().size();
         }
         if(nrJogador == 2){
             return this.partidas[partida].getJogador1().getCartas().size();
         }
-        return -1;
+        return -1;//erro
     }
 
     /**
@@ -293,10 +305,10 @@ public class UnoWSservice {
         int partida = encontraPartida(idJogador);
 
         if(partida > -1){
-            return dicionarioCartas(this.partidas[partida].getTopoDescarte());
+            return dicionarioCartas(this.partidas[partida].getTopoDescarte());//carta mesa
         }
         
-        return "";
+        return "";//erro
     }
 
     /**
@@ -304,11 +316,12 @@ public class UnoWSservice {
      */
     @WebMethod(operationName = "obtemCorAtiva")
     public int obtemCorAtiva(@WebParam(name = "idJogador") int idJogador) {
+        if(temPartida(idJogador) == 0) return -2;//nao tem 2 jogadores
         int partida = encontraPartida(idJogador);
         if(partida > -1){
-            return this.partidas[partida].getCorAtiva();
+            return this.partidas[partida].getCorAtiva();//cor ativa
         }
-        return -1;
+        return -1; //erro
     }
 
     /**
@@ -316,12 +329,19 @@ public class UnoWSservice {
      */
     @WebMethod(operationName = "compraCarta")
     public int compraCarta(@WebParam(name = "idJogador") int idJogador) {
+        
         int partida = encontraPartida(idJogador);
-        if(partida > -1){
+        
+        if(partida == -1) return -1; //jogador nao encontrado
+        if(partida == 0) return -2; //nao tem 2 jogadores
+        if(ehMinhaVez(idJogador) == 0) return -3; //não é a vez do jogador
+//        if(partida > 0){
             int nrJogador = identificaJogador(partida, idJogador);
-            return this.partidas[partida].compraCarta(nrJogador);
-        }
-        return -1;
+            this.partidas[partida].compraCarta(nrJogador);
+            return 1;
+//            return this.partidas[partida].compraCarta(nrJogador);
+//        }
+//        return 1;
     }
 
     /**
@@ -332,22 +352,20 @@ public class UnoWSservice {
         int carta;
         int temPartida = temPartida(idJogador);
         
-        if(temPartida == -2) return -1;
-        
         int partida = encontraPartida(idJogador);
         int nrJogador = identificaJogador(partida, idJogador);
-        
-        
-        if(temPartida == 0) return -2;
-        if(cor < 0 || cor > 3) return -3;
-        
-        if(this.partidas[partida].getVez() != nrJogador) return -4;                
         
         if(nrJogador == 1){
             carta = this.partidas[partida].getJogador1().getCartas().get(indexCarta);
         }else{
             carta = this.partidas[partida].getJogador2().getCartas().get(indexCarta);
         }
+        
+        if(temPartida == -1) return -1;//jogador não encontrado
+        if(temPartida == 0) return -2;//nao tem 2 jogadores
+        if(this.partidas[partida].getVez() != nrJogador) return -3; //Não é a vez do jogador
+        if(ehCoringa(carta) || ehMais4(carta))
+            if(cor < 0 || cor > 3) return -4;//Parametros invalidos
         
         boolean mesmaCor = false;
         
@@ -492,8 +510,8 @@ public class UnoWSservice {
     public int obtemPontos(@WebParam(name = "idJogador") int idJogador) {
         int partida = encontraPartida(idJogador);
         
-        if(partida == -1) return -1;
-        if(temPartida(idJogador) == -1) return -2; 
+        if(partida == -1) return -1; //jogador nao encontrado
+        if(temPartida(idJogador) == 0) return -2; //nao tem 2 jogadores
         
         int nrJogador = identificaJogador(partida, idJogador);
         int pontos = 0;
@@ -828,6 +846,27 @@ public class UnoWSservice {
         }
         return false;
     }
+    
+    
+    public int colocaNaPartida(Jogador  jogador, int partida){
+        
+        if(partidas[partida] == null){ //Se existe essa partida seta o jogador 1
+            partidas[partida].setJogador1(jogador);
+        }else{
+            if(partidas[partida].getJogador1() == null){ //Se existe e não tem jogador seta o jogador 1
+                partidas[partida].setJogador1(jogador);
+            }else{
+                if(partidas[partida].getJogador2() == null){ // Seta jogador 2
+                    partidas[partida].setJogador2(jogador);
+                }else{
+                    return -2; // Partida cheia
+                }
+            }
+        }
+        
+        return jogador.getId();
+    }
+    
     
     /**
      * Identifica se o jogadar eh o 1 ou o 2
