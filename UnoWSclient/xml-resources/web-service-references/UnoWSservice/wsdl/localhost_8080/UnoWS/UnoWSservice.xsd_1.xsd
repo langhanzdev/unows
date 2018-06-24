@@ -1,20 +1,80 @@
 <?xml version='1.0' encoding='UTF-8'?><!-- Published by JAX-WS RI (http://jax-ws.java.net). RI's version is Metro/2.3.2-b608 (trunk-7979; 2015-01-21T12:50:19+0000) JAXWS-RI/2.2.11-b150120.1832 JAXWS-API/2.2.12 JAXB-RI/2.2.12-b141219.1637 JAXB-API/2.2.13-b141020.1521 svn-revision#unknown. --><xs:schema xmlns:tns="http://helloWSservice.me.org/" xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.0" targetNamespace="http://helloWSservice.me.org/">
 
+<xs:element name="colocaNaPartida" type="tns:colocaNaPartida"/>
+
+<xs:element name="colocaNaPartidaResponse" type="tns:colocaNaPartidaResponse"/>
+
 <xs:element name="compraCarta" type="tns:compraCarta"/>
 
 <xs:element name="compraCartaResponse" type="tns:compraCartaResponse"/>
+
+<xs:element name="compraMais2" type="tns:compraMais2"/>
+
+<xs:element name="compraMais2Response" type="tns:compraMais2Response"/>
+
+<xs:element name="dicionarioCartas" type="tns:dicionarioCartas"/>
+
+<xs:element name="dicionarioCartasResponse" type="tns:dicionarioCartasResponse"/>
+
+<xs:element name="ehCoringa" type="tns:ehCoringa"/>
+
+<xs:element name="ehCoringaResponse" type="tns:ehCoringaResponse"/>
+
+<xs:element name="ehInverter" type="tns:ehInverter"/>
+
+<xs:element name="ehInverterResponse" type="tns:ehInverterResponse"/>
+
+<xs:element name="ehMais2" type="tns:ehMais2"/>
+
+<xs:element name="ehMais2Response" type="tns:ehMais2Response"/>
+
+<xs:element name="ehMais4" type="tns:ehMais4"/>
+
+<xs:element name="ehMais4Response" type="tns:ehMais4Response"/>
 
 <xs:element name="ehMinhaVez" type="tns:ehMinhaVez"/>
 
 <xs:element name="ehMinhaVezResponse" type="tns:ehMinhaVezResponse"/>
 
+<xs:element name="ehPular" type="tns:ehPular"/>
+
+<xs:element name="ehPularResponse" type="tns:ehPularResponse"/>
+
 <xs:element name="encerraPartida" type="tns:encerraPartida"/>
 
 <xs:element name="encerraPartidaResponse" type="tns:encerraPartidaResponse"/>
 
+<xs:element name="encontraPartida" type="tns:encontraPartida"/>
+
+<xs:element name="encontraPartidaLivre" type="tns:encontraPartidaLivre"/>
+
+<xs:element name="encontraPartidaLivreResponse" type="tns:encontraPartidaLivreResponse"/>
+
+<xs:element name="encontraPartidaResponse" type="tns:encontraPartidaResponse"/>
+
+<xs:element name="geraIdJogador" type="tns:geraIdJogador"/>
+
+<xs:element name="geraIdJogadorResponse" type="tns:geraIdJogadorResponse"/>
+
+<xs:element name="geraIdPartida" type="tns:geraIdPartida"/>
+
+<xs:element name="geraIdPartidaResponse" type="tns:geraIdPartidaResponse"/>
+
 <xs:element name="hello" type="tns:hello"/>
 
 <xs:element name="helloResponse" type="tns:helloResponse"/>
+
+<xs:element name="identificaJogador" type="tns:identificaJogador"/>
+
+<xs:element name="identificaJogadorResponse" type="tns:identificaJogadorResponse"/>
+
+<xs:element name="inverte" type="tns:inverte"/>
+
+<xs:element name="inverteResponse" type="tns:inverteResponse"/>
+
+<xs:element name="inverteVez" type="tns:inverteVez"/>
+
+<xs:element name="inverteVezResponse" type="tns:inverteVezResponse"/>
 
 <xs:element name="jogaCarta" type="tns:jogaCarta"/>
 
@@ -60,6 +120,14 @@
 
 <xs:element name="preRegistroResponse" type="tns:preRegistroResponse"/>
 
+<xs:element name="pula" type="tns:pula"/>
+
+<xs:element name="pulaResponse" type="tns:pulaResponse"/>
+
+<xs:element name="qualCor" type="tns:qualCor"/>
+
+<xs:element name="qualCorResponse" type="tns:qualCorResponse"/>
+
 <xs:element name="registraJogador" type="tns:registraJogador"/>
 
 <xs:element name="registraJogadorResponse" type="tns:registraJogadorResponse"/>
@@ -76,29 +144,9 @@
 
 <xs:element name="teste2Response" type="tns:teste2Response"/>
 
-<xs:complexType name="test">
-<xs:sequence>
-<xs:element name="name" type="xs:string" minOccurs="0"/>
-</xs:sequence>
-</xs:complexType>
+<xs:element name="usuarioCasdastrado" type="tns:usuarioCasdastrado"/>
 
-<xs:complexType name="testResponse">
-<xs:sequence>
-<xs:element name="return" type="xs:string" minOccurs="0"/>
-</xs:sequence>
-</xs:complexType>
-
-<xs:complexType name="obtemNumCartasOponente">
-<xs:sequence>
-<xs:element name="idJogador" type="xs:int"/>
-</xs:sequence>
-</xs:complexType>
-
-<xs:complexType name="obtemNumCartasOponenteResponse">
-<xs:sequence>
-<xs:element name="return" type="xs:int"/>
-</xs:sequence>
-</xs:complexType>
+<xs:element name="usuarioCasdastradoResponse" type="tns:usuarioCasdastradoResponse"/>
 
 <xs:complexType name="obtemCorAtiva">
 <xs:sequence>
@@ -127,6 +175,17 @@
 </xs:sequence>
 </xs:complexType>
 
+<xs:complexType name="pula">
+<xs:sequence>
+<xs:element name="arg0" type="xs:int"/>
+<xs:element name="arg1" type="xs:int"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="pulaResponse">
+<xs:sequence/>
+</xs:complexType>
+
 <xs:complexType name="obtemOponente">
 <xs:sequence>
 <xs:element name="idJogador" type="xs:int"/>
@@ -136,6 +195,28 @@
 <xs:complexType name="obtemOponenteResponse">
 <xs:sequence>
 <xs:element name="return" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="ehInverter">
+<xs:sequence>
+<xs:element name="arg0" type="xs:int"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="ehInverterResponse">
+<xs:sequence>
+<xs:element name="return" type="xs:boolean"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="geraIdPartida">
+<xs:sequence/>
+</xs:complexType>
+
+<xs:complexType name="geraIdPartidaResponse">
+<xs:sequence>
+<xs:element name="return" type="xs:int"/>
 </xs:sequence>
 </xs:complexType>
 
@@ -175,15 +256,15 @@
 </xs:sequence>
 </xs:complexType>
 
-<xs:complexType name="ehMinhaVez">
+<xs:complexType name="teste2">
 <xs:sequence>
-<xs:element name="idJogador" type="xs:int"/>
+<xs:element name="tipo" type="xs:string" minOccurs="0"/>
 </xs:sequence>
 </xs:complexType>
 
-<xs:complexType name="ehMinhaVezResponse">
+<xs:complexType name="teste2Response">
 <xs:sequence>
-<xs:element name="return" type="xs:int"/>
+<xs:element name="return" type="xs:string" minOccurs="0"/>
 </xs:sequence>
 </xs:complexType>
 
@@ -199,27 +280,23 @@
 </xs:sequence>
 </xs:complexType>
 
-<xs:complexType name="teste2">
+<xs:complexType name="encontraPartidaLivre">
 <xs:sequence>
-<xs:element name="tipo" type="xs:string" minOccurs="0"/>
+<xs:element name="arg0" type="tns:jogador" minOccurs="0"/>
 </xs:sequence>
 </xs:complexType>
 
-<xs:complexType name="teste2Response">
+<xs:complexType name="jogador">
 <xs:sequence>
-<xs:element name="return" type="xs:string" minOccurs="0"/>
+<xs:element name="cartas" type="xs:int" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+<xs:element name="id" type="xs:int"/>
+<xs:element name="nome" type="xs:string" minOccurs="0"/>
 </xs:sequence>
 </xs:complexType>
 
-<xs:complexType name="obtemNumCartas">
+<xs:complexType name="encontraPartidaLivreResponse">
 <xs:sequence>
-<xs:element name="idJogador" type="xs:int"/>
-</xs:sequence>
-</xs:complexType>
-
-<xs:complexType name="obtemNumCartasResponse">
-<xs:sequence>
-<xs:element name="return" type="xs:int"/>
+<xs:element name="return" type="xs:boolean"/>
 </xs:sequence>
 </xs:complexType>
 
@@ -231,17 +308,17 @@
 
 <xs:complexType name="mostraMaoResponse">
 <xs:sequence>
-<xs:element name="return" type="xs:int"/>
+<xs:element name="return" type="xs:string" minOccurs="0"/>
 </xs:sequence>
 </xs:complexType>
 
-<xs:complexType name="obtemCartaMesa">
+<xs:complexType name="inverte">
 <xs:sequence>
-<xs:element name="idJogador" type="xs:int"/>
+<xs:element name="arg0" type="xs:int"/>
 </xs:sequence>
 </xs:complexType>
 
-<xs:complexType name="obtemCartaMesaResponse">
+<xs:complexType name="inverteResponse">
 <xs:sequence>
 <xs:element name="return" type="xs:int"/>
 </xs:sequence>
@@ -256,6 +333,18 @@
 <xs:complexType name="obtemNumCartasBaralhoResponse">
 <xs:sequence>
 <xs:element name="return" type="xs:int"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="obtemCartaMesa">
+<xs:sequence>
+<xs:element name="idJogador" type="xs:int"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="obtemCartaMesaResponse">
+<xs:sequence>
+<xs:element name="return" type="xs:string" minOccurs="0"/>
 </xs:sequence>
 </xs:complexType>
 
@@ -282,6 +371,209 @@
 <xs:complexType name="jogaCartaResponse">
 <xs:sequence>
 <xs:element name="return" type="xs:int"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="inverteVez">
+<xs:sequence>
+<xs:element name="arg0" type="xs:int"/>
+<xs:element name="arg1" type="xs:int"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="inverteVezResponse">
+<xs:sequence/>
+</xs:complexType>
+
+<xs:complexType name="usuarioCasdastrado">
+<xs:sequence>
+<xs:element name="arg0" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="usuarioCasdastradoResponse">
+<xs:sequence>
+<xs:element name="return" type="xs:boolean"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="identificaJogador">
+<xs:sequence>
+<xs:element name="arg0" type="xs:int"/>
+<xs:element name="arg1" type="xs:int"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="identificaJogadorResponse">
+<xs:sequence>
+<xs:element name="return" type="xs:int"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="qualCor">
+<xs:sequence>
+<xs:element name="arg0" type="xs:int"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="qualCorResponse">
+<xs:sequence>
+<xs:element name="return" type="xs:int"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="test">
+<xs:sequence>
+<xs:element name="name" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="testResponse">
+<xs:sequence>
+<xs:element name="return" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="geraIdJogador">
+<xs:sequence/>
+</xs:complexType>
+
+<xs:complexType name="geraIdJogadorResponse">
+<xs:sequence>
+<xs:element name="return" type="xs:int"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="obtemNumCartasOponente">
+<xs:sequence>
+<xs:element name="idJogador" type="xs:int"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="obtemNumCartasOponenteResponse">
+<xs:sequence>
+<xs:element name="return" type="xs:int"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="ehMais4">
+<xs:sequence>
+<xs:element name="arg0" type="xs:int"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="ehMais4Response">
+<xs:sequence>
+<xs:element name="return" type="xs:boolean"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="colocaNaPartida">
+<xs:sequence>
+<xs:element name="arg0" type="tns:jogador" minOccurs="0"/>
+<xs:element name="arg1" type="xs:int"/>
+<xs:element name="arg2" type="xs:int"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="colocaNaPartidaResponse">
+<xs:sequence>
+<xs:element name="return" type="xs:int"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="ehMinhaVez">
+<xs:sequence>
+<xs:element name="idJogador" type="xs:int"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="ehMinhaVezResponse">
+<xs:sequence>
+<xs:element name="return" type="xs:int"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="ehMais2">
+<xs:sequence>
+<xs:element name="arg0" type="xs:int"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="ehMais2Response">
+<xs:sequence>
+<xs:element name="return" type="xs:boolean"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="dicionarioCartas">
+<xs:sequence>
+<xs:element name="arg0" type="xs:int"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="dicionarioCartasResponse">
+<xs:sequence>
+<xs:element name="return" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="encontraPartida">
+<xs:sequence>
+<xs:element name="arg0" type="xs:int"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="encontraPartidaResponse">
+<xs:sequence>
+<xs:element name="return" type="xs:int"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="obtemNumCartas">
+<xs:sequence>
+<xs:element name="idJogador" type="xs:int"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="obtemNumCartasResponse">
+<xs:sequence>
+<xs:element name="return" type="xs:int"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="compraMais2">
+<xs:sequence>
+<xs:element name="arg0" type="xs:int"/>
+<xs:element name="arg1" type="xs:int"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="compraMais2Response">
+<xs:sequence/>
+</xs:complexType>
+
+<xs:complexType name="ehPular">
+<xs:sequence>
+<xs:element name="arg0" type="xs:int"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="ehPularResponse">
+<xs:sequence>
+<xs:element name="return" type="xs:boolean"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="ehCoringa">
+<xs:sequence>
+<xs:element name="arg0" type="xs:int"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="ehCoringaResponse">
+<xs:sequence>
+<xs:element name="return" type="xs:boolean"/>
 </xs:sequence>
 </xs:complexType>
 

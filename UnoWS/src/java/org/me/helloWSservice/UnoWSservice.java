@@ -54,8 +54,8 @@ public class UnoWSservice {
      */
     @WebMethod(operationName = "preRegistro")
     public int preRegistro(@WebParam(name = "j1Nome") String j1Nome, @WebParam(name = "j1Id") int j1Id, @WebParam(name = "j2Nome") String j2Nome, @WebParam(name = "j2Id") int j2Id) {
-        this.preRegistros.add(new PreRegistro(j1Id, j1Nome, idPartidas));
-        this.preRegistros.add(new PreRegistro(j2Id, j2Nome, idPartidas));
+        this.preRegistros.add(new PreRegistro(j1Id, j1Nome, idPartidas,1));
+        this.preRegistros.add(new PreRegistro(j2Id, j2Nome, idPartidas,2));
         idPartidas++;
         return 0;
     }
@@ -80,7 +80,7 @@ public class UnoWSservice {
         Jogador jogador = new Jogador();
         jogador.setNome(nome);
         jogador.setId(aux.getId());
-        return colocaNaPartida(jogador, aux.getPartida()); //return id ou -2
+        return colocaNaPartida(jogador, aux.getPartida(), aux.getPosicao()); //return id ou -2
         
     }
 
@@ -89,10 +89,23 @@ public class UnoWSservice {
      */
     @WebMethod(operationName = "encerraPartida")
     public int encerraPartida(@WebParam(name = "idJogador") int idJogador) {
+        
         int partida = encontraPartida(idJogador);
+        int nrJogador = identificaJogador(partida, idJogador);
         if(partida > -1){
-            this.partidas[partida] = null;
-            return 0;
+            if(nrJogador == 1){
+                this.partidas[partida].setJogador1(null);
+                if(this.partidas[partida].getJogador2() == null){
+                    this.partidas[partida] = null;
+                }
+                return 0;
+            }else{
+                this.partidas[partida].setJogador2(null);
+                if(this.partidas[partida].getJogador1() == null){
+                    this.partidas[partida] = null;
+                }
+                return 0;
+            }
         }
         return -1;
     }
@@ -109,9 +122,9 @@ public class UnoWSservice {
         //Tempo aguardando outro jogador entrar
         long t = System.currentTimeMillis()-this.partidas[partida].getTempoAguardaJogador();
         
-        if(System.currentTimeMillis()-this.partidas[partida].getTempoAguardaJogador() > 120000){               
-            return -2;
-        }
+//        if(System.currentTimeMillis()-this.partidas[partida].getTempoAguardaJogador() > 120000){               
+//            return -2;
+//        }
         
         if(partida > -1){
             if(this.partidas[partida].getJogador1() == null || this.partidas[partida].getJogador2() == null){
@@ -293,7 +306,7 @@ public class UnoWSservice {
         for(Integer i:cartasMao){
             mao += "|" + dicionarioCartas(i);
         }
-        
+        mao = mao.substring(1);
         return mao;
     }
 
@@ -319,6 +332,7 @@ public class UnoWSservice {
         if(temPartida(idJogador) == 0) return -2;//nao tem 2 jogadores
         int partida = encontraPartida(idJogador);
         if(partida > -1){
+            System.out.println("RETURN "+this.partidas[partida].getCorAtiva());
             return this.partidas[partida].getCorAtiva();//cor ativa
         }
         return -1; //erro
@@ -335,13 +349,15 @@ public class UnoWSservice {
         if(partida == -1) return -1; //jogador nao encontrado
         if(partida == 0) return -2; //nao tem 2 jogadores
         if(ehMinhaVez(idJogador) == 0) return -3; //não é a vez do jogador
-//        if(partida > 0){
-            int nrJogador = identificaJogador(partida, idJogador);
-            this.partidas[partida].compraCarta(nrJogador);
-            return 1;
-//            return this.partidas[partida].compraCarta(nrJogador);
-//        }
-//        return 1;
+
+        int nrJogador = identificaJogador(partida, idJogador);
+        this.partidas[partida].compraCarta(nrJogador);//compra
+        if(nrJogador == 1) //e passa a vez
+            this.partidas[partida].setVez(2);
+        else
+            this.partidas[partida].setVez(1);
+        
+        return 1;
     }
 
     /**
@@ -354,6 +370,8 @@ public class UnoWSservice {
         
         int partida = encontraPartida(idJogador);
         int nrJogador = identificaJogador(partida, idJogador);
+        
+        if(indexCarta < 0 || indexCarta >= obtemNumCartas(idJogador)) return -4; //parametros invalidos
         
         if(nrJogador == 1){
             carta = this.partidas[partida].getJogador1().getCartas().get(indexCarta);
@@ -368,10 +386,14 @@ public class UnoWSservice {
             if(cor < 0 || cor > 3) return -4;//Parametros invalidos
         
         boolean mesmaCor = false;
+        int corAtiva = 0;
         
         if(partida > -1){
             
             int topoDescarte = this.partidas[partida].getTopoDescarte(); 
+            corAtiva = descobreCor(topoDescarte);
+            this.partidas[partida].setCorAtiva(corAtiva);
+            System.out.println("COR "+this.partidas[partida].getCorAtiva()+" Carta "+topoDescarte);
             
             //Verifica se a cor eh compativel
             
@@ -390,13 +412,13 @@ public class UnoWSservice {
             
             //Se eh da mesma cor
             if(mesmaCor){
-                int retornoJoga = this.partidas[partida].jogaCarta(indexCarta, cor, nrJogador);
+                int retornoJoga = this.partidas[partida].jogaCarta(indexCarta, corAtiva, nrJogador);
                 if(ehMais2(carta)){
                     compraMais2(partida, nrJogador);
                 }
                 
                 if(ehPular(carta)){
-                    inverte(partida, nrJogador);
+                    inverteVez(partida, nrJogador);
                 }
                 
                 if(ehInverter(carta)){
@@ -409,17 +431,17 @@ public class UnoWSservice {
             //Se a carta anterior era coringa
             if(topoDescarte >= 100 && topoDescarte <= 107){
 
-                int corAtiva = this.partidas[partida].getCorAtiva();
+                corAtiva = this.partidas[partida].getCorAtiva();
                 int corCarta = qualCor(carta);
-                System.out.println("Cor carta "+corCarta+" Cor ativa: "+corAtiva);
+                //System.out.println("Cor carta "+corCarta+" Cor ativa: "+corAtiva);
                 if(corCarta == corAtiva){
-                    int retornoJoga = this.partidas[partida].jogaCarta(indexCarta, cor, nrJogador);
+                    int retornoJoga = this.partidas[partida].jogaCarta(indexCarta, corAtiva, nrJogador);
                     if(ehMais2(carta))
                         compraMais2(partida, nrJogador);
                     if(ehPular(carta))
                         pula(partida, nrJogador);
                     if(ehInverter(carta))
-                        inverte(partida, nrJogador);
+                        inverteVez(partida, nrJogador);
                     
                     return retornoJoga;
                 }
@@ -430,22 +452,22 @@ public class UnoWSservice {
             
             //Se eh carta de ação sobre carta de ação
             if(ehMais2(carta) && ehMais2(topoDescarte)){
-                int retornoJoga = this.partidas[partida].jogaCarta(indexCarta, cor, nrJogador);
+                int retornoJoga = this.partidas[partida].jogaCarta(indexCarta, corAtiva, nrJogador);
                 compraMais2(partida, nrJogador);
                 return retornoJoga;
             }
             
             //Se eh carta de ação sobre carta de ação
             if(ehPular(carta) && ehPular(topoDescarte)){
-                int retornoJoga = this.partidas[partida].jogaCarta(indexCarta, cor, nrJogador);
+                int retornoJoga = this.partidas[partida].jogaCarta(indexCarta, corAtiva, nrJogador);
                 pula(partida, nrJogador);
                 return retornoJoga;
             }
 
             //Se eh carta de ação sobre carta de ação
             if(ehInverter(carta) && ehInverter(topoDescarte)){
-                int retornoJoga = this.partidas[partida].jogaCarta(indexCarta, cor, nrJogador);
-                inverte(partida, nrJogador);
+                int retornoJoga = this.partidas[partida].jogaCarta(indexCarta, corAtiva, nrJogador);
+                inverteVez(partida, nrJogador);
                 return retornoJoga;
             }
             
@@ -481,7 +503,7 @@ public class UnoWSservice {
             }
             
             if(carta+soma == topoDescarte)
-                return this.partidas[partida].jogaCarta(indexCarta, cor, nrJogador);
+                return this.partidas[partida].jogaCarta(indexCarta, corAtiva, nrJogador);
             
             int cartaAux = carta;
             int proximo;
@@ -493,7 +515,7 @@ public class UnoWSservice {
             
             while(cartaAux+proximo < 99 && cartaAux+proximo > 0){
                 if(cartaAux+proximo == topoDescarte || cartaAux+proximo+soma == topoDescarte){
-                    return this.partidas[partida].jogaCarta(indexCarta, cor, nrJogador);
+                    return this.partidas[partida].jogaCarta(indexCarta, corAtiva, nrJogador);
                 }
                 cartaAux += proximo;
                 soma = inverte(soma);
@@ -508,73 +530,6 @@ public class UnoWSservice {
      */
     @WebMethod(operationName = "obtemPontos")
     public int obtemPontos(@WebParam(name = "idJogador") int idJogador) {
-        int partida = encontraPartida(idJogador);
-        
-        if(partida == -1) return -1; //jogador nao encontrado
-        if(temPartida(idJogador) == 0) return -2; //nao tem 2 jogadores
-        
-        int nrJogador = identificaJogador(partida, idJogador);
-        int pontos = 0;
-        
-        ArrayList<Integer> mao;
-        if(nrJogador == 1){
-            mao = this.partidas[partida].getJogador2().getCartas();
-        }else
-            mao = this.partidas[partida].getJogador1().getCartas();
-        
-        
-        for(Integer carta:mao){
-            if(ehMais2(carta) || ehInverter(carta) || ehPular(carta)){
-                pontos += 20;
-                continue;
-            }
-            if(ehCoringa(carta) || ehMais4(carta)){
-                pontos += 50;
-                continue;
-            }
-            
-            if(carta == 0 || carta == 25 || carta == 50 || carta == 75){
-                continue;
-            }
-            
-            int cor = qualCor(carta);
-            int cartaAux = 1;
-            
-            switch(cor){
-                case 0:
-                    cartaAux = carta;
-                    break;
-                case 1:
-                    cartaAux = carta-25;
-                    break;
-                case 2:
-                    cartaAux = carta-50;
-                    break;
-                case 3:
-                    cartaAux = carta-75;
-                    break;
-            }
-            
-            if(cartaAux%2 == 0){
-                pontos += (cartaAux/2);
-            }else{
-                pontos += (cartaAux/2)+1;
-            }
-        }
-        if(nrJogador == 1){
-            this.partidas[partida].setPontosJogador1(pontos);
-            return this.partidas[partida].getPontosJogador1();
-        }else{
-            this.partidas[partida].setPontosJogador2(pontos);
-            return this.partidas[partida].getPontosJogador2();
-        }
-    }
-
-    /**
-     * Web service operation
-     */
-    @WebMethod(operationName = "obtemPontosOponente")
-    public int obtemPontosOponente(@WebParam(name = "idJogador") int idJogador) {
         int partida = encontraPartida(idJogador);
         
         if(partida == -1) return -1;
@@ -629,6 +584,73 @@ public class UnoWSservice {
             }
         }
         if(nrJogador == 2){
+            this.partidas[partida].setPontosJogador1(pontos);
+            return this.partidas[partida].getPontosJogador1();
+        }else{
+            this.partidas[partida].setPontosJogador2(pontos);
+            return this.partidas[partida].getPontosJogador2();
+        }
+    }
+
+    /**
+     * Web service operation
+     */
+    @WebMethod(operationName = "obtemPontosOponente")
+    public int obtemPontosOponente(@WebParam(name = "idJogador") int idJogador) {
+        int partida = encontraPartida(idJogador);
+        
+        if(partida == -1) return -1; //jogador nao encontrado
+        if(temPartida(idJogador) == 0) return -2; //nao tem 2 jogadores
+        
+        int nrJogador = identificaJogador(partida, idJogador);
+        int pontos = 0;
+        
+        ArrayList<Integer> mao;
+        if(nrJogador == 1){
+            mao = this.partidas[partida].getJogador2().getCartas();
+        }else
+            mao = this.partidas[partida].getJogador1().getCartas();
+        
+        
+        for(Integer carta:mao){
+            if(ehMais2(carta) || ehInverter(carta) || ehPular(carta)){
+                pontos += 20;
+                continue;
+            }
+            if(ehCoringa(carta) || ehMais4(carta)){
+                pontos += 50;
+                continue;
+            }
+            
+            if(carta == 0 || carta == 25 || carta == 50 || carta == 75){
+                continue;
+            }
+            
+            int cor = qualCor(carta);
+            int cartaAux = 1;
+            
+            switch(cor){
+                case 0:
+                    cartaAux = carta;
+                    break;
+                case 1:
+                    cartaAux = carta-25;
+                    break;
+                case 2:
+                    cartaAux = carta-50;
+                    break;
+                case 3:
+                    cartaAux = carta-75;
+                    break;
+            }
+            
+            if(cartaAux%2 == 0){
+                pontos += (cartaAux/2);
+            }else{
+                pontos += (cartaAux/2)+1;
+            }
+        }
+        if(nrJogador == 1){
             this.partidas[partida].setPontosJogador1(pontos);
             return this.partidas[partida].getPontosJogador1();
         }else{
@@ -695,7 +717,7 @@ public class UnoWSservice {
      * @param partida
      * @param nrJogador 
      */
-    public void inverte(int partida, int nrJogador){
+    public void inverteVez(int partida, int nrJogador){
         if(nrJogador == 1)
             this.partidas[partida].setVez(1);
         else
@@ -848,20 +870,34 @@ public class UnoWSservice {
     }
     
     
-    public int colocaNaPartida(Jogador  jogador, int partida){
+    public int colocaNaPartida(Jogador  jogador, int partida, int posicao){
         
-        if(partidas[partida] == null){ //Se existe essa partida seta o jogador 1
-            partidas[partida].setJogador1(jogador);
-        }else{
-            if(partidas[partida].getJogador1() == null){ //Se existe e não tem jogador seta o jogador 1
-                partidas[partida].setJogador1(jogador);
+        if(partidas[partida] == null){ //Se nao existe essa partida
+            Partida p = new Partida();
+            partidas[partida] = p;
+            if(posicao == 1){
+                partidas[partida].setJogador1(jogador);System.out.println("C Reg na pos 1 id"+jogador.getId());
+                partidas[partida].setVez(1);
             }else{
-                if(partidas[partida].getJogador2() == null){ // Seta jogador 2
-                    partidas[partida].setJogador2(jogador);
+                partidas[partida].setJogador2(jogador);System.out.println("C reg na pos 2 id"+jogador.getId());
+                partidas[partida].setVez(2);
+            }
+        }else{ // Se ja existe partida
+            if(posicao == 1){
+                if(partidas[partida].getJogador1() == null){
+                    partidas[partida].setJogador1(jogador);System.out.println("reg na pos 1 id"+jogador.getId());
                 }else{
-                    return -2; // Partida cheia
+                    return -2;
+                }
+            }else{
+                if(partidas[partida].getJogador2() == null){
+                    partidas[partida].setJogador2(jogador);System.out.println("reg na pos 2 id"+jogador.getId());
+                }else{
+                    return -2;
                 }
             }
+            
+            
         }
         
         return jogador.getId();
@@ -882,6 +918,22 @@ public class UnoWSservice {
         if(this.partidas[partida].getJogador2() != null){
             if(this.partidas[partida].getJogador2().getId() == idJogador)
                 return 2;
+        }
+        return 0;
+    }
+    
+    public int descobreCor(int carta){
+        if(carta >=0 && carta <=24){ //Azul
+            return 0;
+        }
+        if(carta >=25 && carta <=49){//Amarela 
+            return 1;
+        }
+        if(carta >=50 && carta <=74){//Verde
+            return 2;
+        }
+        if(carta >=75 && carta <=99){//Vermelha
+            return 3;
         }
         return 0;
     }

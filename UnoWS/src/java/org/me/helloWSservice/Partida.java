@@ -48,10 +48,14 @@ public class Partida{
             geraBaralho();
             embaralha();
             distribuiCartas();
-            do{
+            do{//descarta coringas
                 this.descarte[numDescarte] = baralho[--numCartas];
-            }while(this.descarte[numDescarte] >= 104 && this.descarte[numDescarte] >= 107);
-            setVez(1);
+            }while(this.descarte[numDescarte] >= 100 && this.descarte[numDescarte] >= 107);
+            //setVez(1);
+            this.setCorAtiva(descobreCor(this.descarte[numDescarte]));
+            if(ehInverter(this.descarte[numDescarte]) || ehPular(this.descarte[numDescarte])){
+                this.setVez(2);
+            }
         }
         this.temBaralho = true;
     }
@@ -246,6 +250,44 @@ public class Partida{
 
     public void setJogador2(Jogador jogador2) {
         this.jogador2 = jogador2;
+    }
+    
+    public int descobreCor(int carta){
+        if(carta >=0 && carta <=24){ //Azul
+            return 0;
+        }else
+        if(carta >=25 && carta <=49){//Amarela 
+            return 1;
+        }else
+        if(carta >=50 && carta <=74){//Verde
+            return 2;
+        }else
+        if(carta >=75 && carta <=99){//Vermelha
+            return 3;
+        }
+        return 0;
+    }
+    
+    /**
+     * Verifica se a carta eh pular (Pu/cor)
+     * @param carta
+     * @return 
+     */
+    public boolean ehPular(int carta){
+        if(carta == 19 || carta == 20 || carta == 44 || carta == 45 || carta == 60 || carta == 70 || carta == 94 || carta == 95)
+            return true;
+        return false;
+    }
+    
+    /**
+     * Verifica se a carta eh inverter (In/cor)
+     * @param carta
+     * @return 
+     */
+    public boolean ehInverter(int carta){
+        if(carta == 21 || carta == 22 || carta == 46 || carta == 47 || carta == 71 || carta == 72 || carta == 96 || carta == 97)
+            return true;
+        return false;
     }
 
     @Override

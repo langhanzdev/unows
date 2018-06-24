@@ -14,11 +14,22 @@ public class PreRegistro {
     private int id;
     private String nome;
     private int partida;
+    private int posicao;
 
-    public PreRegistro(int id, String nome, int partida) {
+    public PreRegistro(int id, String nome, int partida, int posicao) {
         this.id = id;
         this.nome = nome;
         this.partida = partida;
+        this.posicao = posicao;
+    }
+
+    
+    public int getPosicao() {
+        return posicao;
+    }
+
+    public void setPosicao(int posicao) {
+        this.posicao = posicao;
     }
 
     public int getId() {
