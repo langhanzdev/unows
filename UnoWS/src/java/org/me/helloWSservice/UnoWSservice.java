@@ -306,7 +306,8 @@ public class UnoWSservice {
         for(Integer i:cartasMao){
             mao += "|" + dicionarioCartas(i);
         }
-        mao = mao.substring(1);
+        if(!mao.equals(""))
+            mao = mao.substring(1);
         return mao;
     }
 
@@ -332,7 +333,8 @@ public class UnoWSservice {
         if(temPartida(idJogador) == 0) return -2;//nao tem 2 jogadores
         int partida = encontraPartida(idJogador);
         if(partida > -1){
-            System.out.println("RETURN "+this.partidas[partida].getCorAtiva());
+            System.out.println("RETURN "+this.partidas[partida].getCorAtiva()+ "Carta topo "+obtemCartaMesa(idJogador));
+            
             return this.partidas[partida].getCorAtiva();//cor ativa
         }
         return -1; //erro
@@ -345,10 +347,12 @@ public class UnoWSservice {
     public int compraCarta(@WebParam(name = "idJogador") int idJogador) {
         
         int partida = encontraPartida(idJogador);
+        if(temPartida(idJogador) == 0) return -2;//nao tem 2 jogadores
         
         if(partida == -1) return -1; //jogador nao encontrado
-        if(partida == 0) return -2; //nao tem 2 jogadores
         if(ehMinhaVez(idJogador) == 0) return -3; //não é a vez do jogador
+        //if(partida == 0) return -2;  
+        
 
         int nrJogador = identificaJogador(partida, idJogador);
         this.partidas[partida].compraCarta(nrJogador);//compra
@@ -391,8 +395,8 @@ public class UnoWSservice {
         if(partida > -1){
             
             int topoDescarte = this.partidas[partida].getTopoDescarte(); 
-            corAtiva = descobreCor(topoDescarte);
-            this.partidas[partida].setCorAtiva(corAtiva);
+            corAtiva = descobreCor(carta);
+            //this.partidas[partida].setCorAtiva(corAtiva);
             System.out.println("COR "+this.partidas[partida].getCorAtiva()+" Carta "+topoDescarte);
             
             //Verifica se a cor eh compativel
@@ -518,7 +522,7 @@ public class UnoWSservice {
                     return this.partidas[partida].jogaCarta(indexCarta, corAtiva, nrJogador);
                 }
                 cartaAux += proximo;
-                soma = inverte(soma);
+                //soma = inverte(soma);
             }
            
         }
