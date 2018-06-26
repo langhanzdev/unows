@@ -80,6 +80,7 @@ public class UnoWSservice {
         Jogador jogador = new Jogador();
         jogador.setNome(nome);
         jogador.setId(aux.getId());
+        if(aux.getPartida() >= this.nrPartidas) return -2; //numero maximo 
         return colocaNaPartida(jogador, aux.getPartida(), aux.getPosicao()); //return id ou -2
         
     }
@@ -333,7 +334,6 @@ public class UnoWSservice {
         if(temPartida(idJogador) == 0) return -2;//nao tem 2 jogadores
         int partida = encontraPartida(idJogador);
         if(partida > -1){
-            System.out.println("RETURN "+this.partidas[partida].getCorAtiva()+ "Carta topo "+obtemCartaMesa(idJogador));
             
             return this.partidas[partida].getCorAtiva();//cor ativa
         }
@@ -398,8 +398,7 @@ public class UnoWSservice {
             
             int topoDescarte = this.partidas[partida].getTopoDescarte(); 
             corAtiva = descobreCor(carta);
-            //this.partidas[partida].setCorAtiva(corAtiva);
-            System.out.println("COR "+this.partidas[partida].getCorAtiva()+" Carta "+topoDescarte);
+            
             
             //Verifica se a cor eh compativel
             
@@ -439,7 +438,7 @@ public class UnoWSservice {
 
                 corAtiva = this.partidas[partida].getCorAtiva();
                 int corCarta = qualCor(carta);
-                //System.out.println("Cor carta "+corCarta+" Cor ativa: "+corAtiva);
+                
                 if(corCarta == corAtiva){
                     int retornoJoga = this.partidas[partida].jogaCarta(indexCarta, corAtiva, nrJogador);
                     if(ehMais2(carta))
@@ -882,22 +881,22 @@ public class UnoWSservice {
             Partida p = new Partida();
             partidas[partida] = p;
             if(posicao == 1){
-                partidas[partida].setJogador1(jogador);System.out.println("C Reg na pos 1 id"+jogador.getId());
+                partidas[partida].setJogador1(jogador);
                 partidas[partida].setVez(1);
             }else{
-                partidas[partida].setJogador2(jogador);System.out.println("C reg na pos 2 id"+jogador.getId());
+                partidas[partida].setJogador2(jogador);
                 partidas[partida].setVez(2);
             }
         }else{ // Se ja existe partida
             if(posicao == 1){
                 if(partidas[partida].getJogador1() == null){
-                    partidas[partida].setJogador1(jogador);System.out.println("reg na pos 1 id"+jogador.getId());
+                    partidas[partida].setJogador1(jogador);
                 }else{
                     return -2;
                 }
             }else{
                 if(partidas[partida].getJogador2() == null){
-                    partidas[partida].setJogador2(jogador);System.out.println("reg na pos 2 id"+jogador.getId());
+                    partidas[partida].setJogador2(jogador);
                 }else{
                     return -2;
                 }
