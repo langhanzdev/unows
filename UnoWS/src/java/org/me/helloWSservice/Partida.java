@@ -56,6 +56,11 @@ public class Partida{
             if(ehInverter(this.descarte[numDescarte]) || ehPular(this.descarte[numDescarte])){
                 this.setVez(2);
             }
+            if(ehMais2(this.descarte[numDescarte])){
+                compraCarta(1);
+                compraCarta(1);
+                this.setVez(2);
+            }
         }
         this.temBaralho = true;
     }
@@ -289,6 +294,18 @@ public class Partida{
             return true;
         return false;
     }
+    
+    /**
+     * Verifica se a carta eh um +2 (+2/Cor)
+     * @param carta
+     * @return 
+     */
+    public boolean ehMais2(int carta){
+        if(carta == 23 || carta == 24 || carta == 49 || carta == 48 || carta == 74 || carta == 73 || carta == 98 || carta == 99)
+            return true;
+        return false;
+    }
+    
 
     @Override
     public String toString() {

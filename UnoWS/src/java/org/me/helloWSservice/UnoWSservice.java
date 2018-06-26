@@ -53,7 +53,7 @@ public class UnoWSservice {
      * Web service operation
      */
     @WebMethod(operationName = "preRegistro")
-    public int preRegistro(@WebParam(name = "j1Nome") String j1Nome, @WebParam(name = "j1Id") int j1Id, @WebParam(name = "j2Nome") String j2Nome, @WebParam(name = "j2Id") int j2Id) {
+    public synchronized int preRegistro(@WebParam(name = "j1Nome") String j1Nome, @WebParam(name = "j1Id") int j1Id, @WebParam(name = "j2Nome") String j2Nome, @WebParam(name = "j2Id") int j2Id) {
         this.preRegistros.add(new PreRegistro(j1Id, j1Nome, idPartidas,1));
         this.preRegistros.add(new PreRegistro(j2Id, j2Nome, idPartidas,2));
         idPartidas++;
@@ -64,7 +64,7 @@ public class UnoWSservice {
      * Web service operation
      */
     @WebMethod(operationName = "registraJogador")
-    public int registraJogador(@WebParam(name = "nome") String nome) {
+    public synchronized int registraJogador(@WebParam(name = "nome") String nome) {
         
         PreRegistro aux = null;
         for(PreRegistro  pre:preRegistros){ //Percorre lista de pre registros
@@ -88,7 +88,7 @@ public class UnoWSservice {
      * Web service operation
      */
     @WebMethod(operationName = "encerraPartida")
-    public int encerraPartida(@WebParam(name = "idJogador") int idJogador) {
+    public synchronized int encerraPartida(@WebParam(name = "idJogador") int idJogador) {
         
         int partida = encontraPartida(idJogador);
         int nrJogador = identificaJogador(partida, idJogador);
@@ -114,7 +114,7 @@ public class UnoWSservice {
      * Web service operation
      */
     @WebMethod(operationName = "temPartida")
-    public int temPartida(@WebParam(name = "idJogador") int idJogador) {
+    public synchronized int temPartida(@WebParam(name = "idJogador") int idJogador) {
         int partida = encontraPartida(idJogador);
         
         if(partida == -1) return -1; //Não existe partida para esse jogador
@@ -153,7 +153,7 @@ public class UnoWSservice {
      * Web service operation
      */
     @WebMethod(operationName = "obtemOponente")
-    public String obtemOponente(@WebParam(name = "idJogador") int idJogador) {
+    public synchronized String obtemOponente(@WebParam(name = "idJogador") int idJogador) {
         int partida = encontraPartida(idJogador);
         if(partida > -1){
             int nrJogador = identificaJogador(partida, idJogador);
@@ -178,7 +178,7 @@ public class UnoWSservice {
      * Web service operation
      */
     @WebMethod(operationName = "ehMinhaVez")
-    public int ehMinhaVez(@WebParam(name = "idJogador") int idJogador) {
+    public synchronized int ehMinhaVez(@WebParam(name = "idJogador") int idJogador) {
         int partida = encontraPartida(idJogador);
         int temPartida = temPartida(idJogador);
         
@@ -247,7 +247,7 @@ public class UnoWSservice {
      * Web service operation
      */
     @WebMethod(operationName = "obtemNumCartasBaralho")
-    public int obtemNumCartasBaralho(@WebParam(name = "idJogador") int idJogador) {
+    public synchronized int obtemNumCartasBaralho(@WebParam(name = "idJogador") int idJogador) {
         if(temPartida(idJogador) == 0) return -2; //ainda não tem 2 jogadores
         int partida = encontraPartida(idJogador);
         if(this.partidas[partida].getBaralho() != null)
@@ -259,7 +259,7 @@ public class UnoWSservice {
      * Web service operation
      */
     @WebMethod(operationName = "obtemNumCartas")
-    public int obtemNumCartas(@WebParam(name = "idJogador") int idJogador) {
+    public synchronized int obtemNumCartas(@WebParam(name = "idJogador") int idJogador) {
         if(temPartida(idJogador) == 0) return -2;//ainda nao tem 2 jogadores
         int partida = encontraPartida(idJogador);
         int nrJogador = identificaJogador(partida, idJogador);
@@ -276,7 +276,7 @@ public class UnoWSservice {
      * Web service operation
      */
     @WebMethod(operationName = "obtemNumCartasOponente")
-    public int obtemNumCartasOponente(@WebParam(name = "idJogador") int idJogador) {
+    public synchronized int obtemNumCartasOponente(@WebParam(name = "idJogador") int idJogador) {
         if(temPartida(idJogador) == 0) return -2;//nao tem 2 jogadores
         int partida = encontraPartida(idJogador);
         int nrJogador = identificaJogador(partida, idJogador);
@@ -293,7 +293,7 @@ public class UnoWSservice {
      * Web service operation
      */
     @WebMethod(operationName = "mostraMao")
-    public String mostraMao(@WebParam(name = "idJogador") int idJogador) {
+    public synchronized String mostraMao(@WebParam(name = "idJogador") int idJogador) {
         int partida = encontraPartida(idJogador);
         int nrJogador = identificaJogador(partida, idJogador);
         String mao = "";
@@ -315,7 +315,7 @@ public class UnoWSservice {
      * Web service operation
      */
     @WebMethod(operationName = "obtemCartaMesa")
-    public String obtemCartaMesa(@WebParam(name = "idJogador") int idJogador) {
+    public synchronized String obtemCartaMesa(@WebParam(name = "idJogador") int idJogador) {
         int partida = encontraPartida(idJogador);
 
         if(partida > -1){
@@ -329,7 +329,7 @@ public class UnoWSservice {
      * Web service operation
      */
     @WebMethod(operationName = "obtemCorAtiva")
-    public int obtemCorAtiva(@WebParam(name = "idJogador") int idJogador) {
+    public synchronized int obtemCorAtiva(@WebParam(name = "idJogador") int idJogador) {
         if(temPartida(idJogador) == 0) return -2;//nao tem 2 jogadores
         int partida = encontraPartida(idJogador);
         if(partida > -1){
@@ -344,7 +344,7 @@ public class UnoWSservice {
      * Web service operation
      */
     @WebMethod(operationName = "compraCarta")
-    public int compraCarta(@WebParam(name = "idJogador") int idJogador) {
+    public synchronized int compraCarta(@WebParam(name = "idJogador") int idJogador) {
         
         int partida = encontraPartida(idJogador);
         if(temPartida(idJogador) == 0) return -2;//nao tem 2 jogadores
@@ -368,13 +368,15 @@ public class UnoWSservice {
      * Web service operation
      */
     @WebMethod(operationName = "jogaCarta")
-    public int jogaCarta(@WebParam(name = "idJogador") int idJogador, @WebParam(name = "carta") int indexCarta, @WebParam(name = "cor") int cor) {
+    public synchronized int jogaCarta(@WebParam(name = "idJogador") int idJogador, @WebParam(name = "carta") int indexCarta, @WebParam(name = "cor") int cor) {
         int carta;
         int temPartida = temPartida(idJogador);
         
         int partida = encontraPartida(idJogador);
         int nrJogador = identificaJogador(partida, idJogador);
         
+        if(this.partidas[partida].getVez() != nrJogador) return -3; //Não é a vez do jogador
+      
         if(indexCarta < 0 || indexCarta >= obtemNumCartas(idJogador)) return -4; //parametros invalidos
         
         if(nrJogador == 1){
@@ -422,7 +424,7 @@ public class UnoWSservice {
                 }
                 
                 if(ehPular(carta)){
-                    inverteVez(partida, nrJogador);
+                    pula(partida, nrJogador);
                 }
                 
                 if(ehInverter(carta)){
@@ -533,7 +535,7 @@ public class UnoWSservice {
      * Web service operation
      */
     @WebMethod(operationName = "obtemPontos")
-    public int obtemPontos(@WebParam(name = "idJogador") int idJogador) {
+    public synchronized int obtemPontos(@WebParam(name = "idJogador") int idJogador) {
         int partida = encontraPartida(idJogador);
         
         if(partida == -1) return -1;
@@ -600,7 +602,7 @@ public class UnoWSservice {
      * Web service operation
      */
     @WebMethod(operationName = "obtemPontosOponente")
-    public int obtemPontosOponente(@WebParam(name = "idJogador") int idJogador) {
+    public synchronized int obtemPontosOponente(@WebParam(name = "idJogador") int idJogador) {
         int partida = encontraPartida(idJogador);
         
         if(partida == -1) return -1; //jogador nao encontrado
